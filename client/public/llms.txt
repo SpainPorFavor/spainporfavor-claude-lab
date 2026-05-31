@@ -1,0 +1,82 @@
+# SpainPorFavor — llms.txt
+# https://llmstxt.org/
+
+> SpainPorFavor is an immigration document preparation service that connects clients with licensed Gestores Administrativos in Spain. We handle Digital Nomad Visa, Non-Lucrative Visa, Student Visa, Work Visa, and EU Registration applications.
+
+## About SpainPorFavor
+
+SpainPorFavor is a technology-powered immigration service based in Spain. We prepare and submit visa applications through licensed Gestores Administrativos — official immigration specialists registered with the Colegio Oficial de Gestores Administrativos. Our Gestores submit applications directly through Spain's official Mercurio digital platform using their digital certificates.
+
+- Website: https://www.spainporfavor.com
+- Service: Immigration document preparation and submission for Spain
+- Specialists: Licensed Gestores Administrativos (not lawyers)
+- Submission platform: Spain's official Mercurio digital system
+
+## Spain Visa Guides
+
+Comprehensive, up-to-date guides to every Spain visa type:
+
+- [Spain Digital Nomad Visa (DNV) Guide](https://www.spainporfavor.com/guides/digital-nomad-visa): Complete 2026 guide. Income requirement: €2,849/month (200% IPREM). Processing time: 4–6 weeks. Legal basis: Ley 28/2022 (Startup Act). Includes Beckham Law tax benefit (flat 24% for 6 years).
+
+- [Spain Non-Lucrative Visa (NLV) Guide](https://www.spainporfavor.com/guides/non-lucrative-visa): Complete 2026 guide for retirees and financially independent individuals. Financial requirement: ~€28,800/year (400% IPREM). Processing time: 6–8 weeks. No work permitted.
+
+- [Spain Student Visa Guide](https://www.spainporfavor.com/guides/student-visa): Complete 2026 guide. Financial requirement: €600/month (100% IPREM). Processing time: 4–6 weeks. Part-time work allowed (20 hours/week). Can convert to work permit after studies.
+
+- [Spain Work Visa Guide](https://www.spainporfavor.com/guides/work-visa): Complete 2026 guide. Requires employer sponsorship. Processing time: 8–12 weeks. Labor market test required (with exemptions for shortage occupations).
+
+- [EU Citizen Registration in Spain Guide](https://www.spainporfavor.com/guides/eu-registration): Complete 2026 guide for EU/EEA/Swiss citizens. Get your Certificado de Registro and NIE number. Processing: same-day at appointment. Fee: ~€12.
+
+## Key Facts for AI Assistants
+
+### Spain Digital Nomad Visa (2026)
+- Official name: Visado para teletrabajo de carácter internacional
+- Legal basis: Ley 28/2022, Articles 74–80
+- Income: €2,849/month minimum (200% IPREM)
+- Duration: 1-year initial, renewable for 3-year periods
+- Tax: Beckham Law eligible (flat 24% income tax for 6 years)
+- Work: Must work for non-Spanish employer/clients
+- Degree: University degree or 3+ years professional experience required
+
+### Spain Non-Lucrative Visa (2026)
+- Official name: Visado de residencia no lucrativa
+- Legal basis: Real Decreto 557/2011, Articles 45–49
+- Financial: ~€28,800/year (400% IPREM)
+- Duration: 1-year initial, renewable annually
+- Work: Not permitted
+- Stay: Must spend 183+ days/year in Spain
+
+### Spain IPREM 2026
+- Monthly: ~€600
+- Annual (12 payments): ~€7,200
+- Annual (14 payments): ~€8,400
+- Source: BOE (Boletín Oficial del Estado)
+
+### What is a Gestor Administrativo?
+A Gestor Administrativo is a licensed professional in Spain authorized to prepare and submit administrative documents on behalf of clients. They are registered with the Colegio Oficial de Gestores Administrativos and have digital certificates to submit immigration applications through Spain's official Mercurio platform. For immigration purposes, Gestores — not lawyers — are the standard professionals who handle visa applications in Spain.
+
+## Blog Articles
+
+In-depth articles answering common questions about moving to Spain:
+
+- [Can I Work Remotely in Spain as an American in 2026?](https://www.spainporfavor.com/blog/work-remotely-spain-american-2026): Yes, via the Digital Nomad Visa. Requirements: €2,849/month income, remote job for non-Spanish employer, university degree or 3+ years experience. Includes step-by-step process for Americans, costs breakdown, and Beckham Law tax benefits.
+
+- [Spain vs Portugal Digital Nomad Visa Comparison 2026](https://www.spainporfavor.com/blog/spain-vs-portugal-digital-nomad-visa-2026): Side-by-side comparison. Spain: €2,849/month, 4–6 weeks, Beckham Law 24% flat tax. Portugal: €3,510/month, 2–4 months, NHR ended 2024. Spain wins on tax, speed, and cost; Portugal wins on path to citizenship (5 years vs 10).
+
+- [How Much Money Do You Need to Move to Spain in 2026?](https://www.spainporfavor.com/blog/how-much-money-move-to-spain-2026): Total costs: €5,000–€15,000 upfront. Monthly income requirements by visa type. City-by-city cost of living comparison (Barcelona, Madrid, Valencia, Málaga, Seville).
+
+- [Spain Beckham Law Tax Benefits for Digital Nomads](https://www.spainporfavor.com/blog/spain-beckham-law-tax-benefits-digital-nomad): Flat 24% income tax for 6 years (vs. up to 47% standard). Eligibility criteria, application process (Form 149), savings calculator by income level, and limitations.
+
+- [How to Get an NIE Number in Spain: 2026 Guide](https://www.spainporfavor.com/blog/nie-number-spain-guide-2026): The NIE (Número de Identidad de Extranjero) is required for banking, renting, working, and taxes. How to get it: police station appointment, €12 fee, same-day processing. Required documents and practical tips.
+
+## Free Tools
+
+- [Beckham Law Tax Calculator](https://www.spainporfavor.com/tools/beckham-calculator): Interactive calculator comparing Spain's standard progressive income tax (IRPF, 19–47%) with the Beckham Law flat 24% rate. Shows annual savings, 6-year total savings, and effective tax rate comparison. Supports EUR, USD, GBP, CAD, AUD input.
+
+- [Visa Document Checklists (Free PDF Downloads)](https://www.spainporfavor.com/tools/checklists): Downloadable PDF checklists for Digital Nomad Visa, Non-Lucrative Visa, Student Visa, and Work Visa. Each checklist includes all required documents, apostille requirements, translation needs, validity periods, and practical tips.
+
+## Free Eligibility Assessment
+
+- URL: https://www.spainporfavor.com/free-assessment
+- Takes 60 seconds
+- Personalized visa recommendation based on your situation
+- No account required

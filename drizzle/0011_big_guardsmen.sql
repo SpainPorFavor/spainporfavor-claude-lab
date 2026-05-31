@@ -1,0 +1,1 @@
+ALTER TABLE `management_tasks` MODIFY COLUMN `createdBy` enum('human','ai','system','rule_engine') NOT NULL DEFAULT 'human';

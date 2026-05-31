@@ -5,6 +5,7 @@
 import PDFDocument from "pdfkit";
 import type { Express, Request, Response } from "express";
 import { getChecklistForVisaType, type DocumentSlotTemplate } from "./documentChecklists";
+import { isPaidVisaProduct } from "../shared/visaRoutes";
 
 // Visa type metadata for PDF headers
 const VISA_METADATA: Record<
@@ -49,6 +50,9 @@ const WHITE = [255, 255, 255] as const;
 const LIGHT_BG = [250, 251, 252] as const; // #FAFBFC
 
 function generateChecklistPDF(visaType: string): PDFKit.PDFDocument {
+  if (!isPaidVisaProduct(visaType)) {
+    throw new Error(`Invalid visa type for PDF generation: ${JSON.stringify(visaType)}`);
+  }
   const meta = VISA_METADATA[visaType];
   const checklist = getChecklistForVisaType(visaType);
 

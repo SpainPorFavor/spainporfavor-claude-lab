@@ -17,6 +17,7 @@ import {
   ValidationStatus,
 } from "../drizzle/schema";
 import { getChecklistForVisaType } from "./documentChecklists";
+import { isPaidVisaProduct, PAID_VISA_PRODUCTS } from "../shared/visaRoutes";
 
 // ============================================================
 // CASES
@@ -32,6 +33,16 @@ export async function createCase(data: InsertCase): Promise<number> {
 }
 
 export async function createCaseWithSlots(data: InsertCase): Promise<number> {
+  // Single choke point for case creation: every payment webhook and admin
+  // form ends here. Reject unknown visa products before they enter the DB
+  // rather than letting them flow through and silently receive a DNV
+  // checklist. See docs/product-routes.md.
+  if (!isPaidVisaProduct(data.visaType)) {
+    throw new Error(
+      `Unknown visa product: ${JSON.stringify(data.visaType)}. Must be one of: ${PAID_VISA_PRODUCTS.join(", ")}`
+    );
+  }
+
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
@@ -39,7 +50,7 @@ export async function createCaseWithSlots(data: InsertCase): Promise<number> {
   const result = await db.insert(cases).values(data);
   const caseId = (result as any)[0]?.insertId;
 
-  // Generate document slots based on visa type
+  // Generate document slots based on visa type (now type-guaranteed PaidVisaProduct)
   const checklist = getChecklistForVisaType(data.visaType);
   for (const slot of checklist) {
     await db.insert(documentSlots).values({

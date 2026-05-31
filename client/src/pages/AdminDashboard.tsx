@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { isPaidVisaProduct } from "@shared/visaRoutes";
 
 const STATUS_COLORS: Record<string, string> = {
   onboarding: "bg-blue-100 text-blue-700",
@@ -583,8 +584,16 @@ function CreateCaseView({ onCreated }: { onCreated: () => void }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Narrow visaType to PaidVisaProduct before sending. The server's zod
+    // schema rejects unknown values, so this is also belt-and-braces on the
+    // client side. See shared/visaRoutes.ts.
+    if (!isPaidVisaProduct(form.visaType)) {
+      toast.error("Please select a valid visa type.");
+      return;
+    }
     createCase.mutate({
       ...form,
+      visaType: form.visaType,
       dependents: Number(form.dependents),
     });
   };

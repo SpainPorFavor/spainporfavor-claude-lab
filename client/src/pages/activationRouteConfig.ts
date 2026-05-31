@@ -296,26 +296,18 @@ const genericConfig: RouteConfig = {
 };
 
 // ── Route detection logic ──
-const DNV_SLUGS = new Set([
-  "digital-nomad-visa",
-  "dnv",
-  "visa-digital-nomad",
-]);
-
-const EU_SLUGS = new Set([
-  "eu-registration",
-  "eu-registration-certificate",
-  "eu-certificate",
-  "certificado-registro",
-]);
+// Single source of truth: shared/visaRoutes.ts. No local slug heuristics —
+// unknown product IDs route to `genericConfig`, never silently to DNV.
+import { resolveRouteGroup } from "@shared/visaRoutes";
 
 export function getRouteConfig(productId: string | null | undefined): RouteConfig {
-  if (!productId) return genericConfig;
-  const slug = productId.toLowerCase().trim();
-  if (DNV_SLUGS.has(slug)) return dnvConfig;
-  if (EU_SLUGS.has(slug)) return euConfig;
-  // Check partial matches
-  if (slug.includes("nomad") || slug.includes("dnv")) return dnvConfig;
-  if (slug.includes("eu-reg") || slug.includes("certificado")) return euConfig;
-  return genericConfig;
+  switch (resolveRouteGroup(productId)) {
+    case "eu":
+      return euConfig;
+    case "dnv":
+      return dnvConfig;
+    case "generic":
+    case "unknown":
+      return genericConfig;
+  }
 }

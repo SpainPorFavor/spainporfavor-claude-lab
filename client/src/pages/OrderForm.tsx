@@ -125,14 +125,29 @@ function PaymentForm() {
 
   // Read params from URL
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
-  const productId = params.get("product") || "digital-nomad-visa";
+  // Resolve product strictly from the URL — no silent DNV default. If the URL
+  // is missing or has a product we don't recognise, redirect to the quiz so
+  // the user can pick a real visa type. See docs/product-routes.md.
+  const rawProductId = params.get("product");
+  const productId = rawProductId && PRODUCT_INFO[rawProductId] ? rawProductId : null;
   const prefillName = params.get("name") || "";
   const prefillEmail = params.get("email") || "";
   const prefillPhone = params.get("phone") || "";
   const prefillNationality = params.get("nationality") || "other";
   const prefillDependents = parseInt(params.get("dependents") || "0", 10);
 
-  const product = PRODUCT_INFO[productId] || PRODUCT_INFO["digital-nomad-visa"];
+  useEffect(() => {
+    if (!productId) {
+      toast.error("We couldn't determine your visa type. Please retake the quiz.");
+      navigate("/#quiz");
+    }
+  }, [productId, navigate]);
+
+  // After the useEffect schedules navigation, render nothing. Rest of the
+  // component below assumes `product` is non-null; bailing here keeps the
+  // type system honest without a silent DNV fallback.
+  if (!productId) return null;
+  const product = PRODUCT_INFO[productId];
   const totalPrice = product.price + product.depPrice * prefillDependents;
 
   // Form state

@@ -1,6 +1,8 @@
 # Product Routes (Canonical)
 
 > The funnel branches on visa product. This document is the single source of truth for those branches. **EU Registration and Digital Nomad Visa are never to be conflated**, in code or in copy.
+>
+> **Code source of truth: `shared/visaRoutes.ts`** (introduced in PR-2). All slug matchers, checklist generators, and case-creation entry points use the resolver and type-guard exported from that module. Do not add new slug heuristics elsewhere.
 
 ---
 
@@ -80,12 +82,12 @@ Today there are **four independent slug matchers** each with its own fallback. T
 
 ---
 
-## Known Route-Mismatch Risks (must be fixed before declaring rebuild done)
+## Known Route-Mismatch Risks
 
-1. **`getChecklistForVisaType` defaults to DNV** for unknown visa types. An EU client could end up with a DNV checklist. The fix is to throw or return an explicit unknown route.
-2. **`Home.tsx` line ~473** defaults to `"digital-nomad-visa"` when the recommendation label is not in `VISA_NAME_TO_PRODUCT_ID`. Same problem at a different layer.
-3. **Slug matchers in the four config files use different `slug.includes(...)` heuristics**, so the same `cases.visaType` value can be classified as EU in one place and Generic in another. The fix is to delete the heuristics and use exact slug matches against `docs/product-routes.md`.
-4. **`resolveDocumentType` in `documentRequirementConfig.ts` has no case for `employment_evidence`**, the document type used by the EU Registration checklist. EU users see a disabled, unexplained button on the intake page. The fix is to add the missing mappings.
+1. ~~**`getChecklistForVisaType` defaults to DNV** for unknown visa types.~~ **Closed in PR-2.** The function now takes a `PaidVisaProduct` typed parameter, has an exhaustive switch with no default, and throws at runtime if a caller bypasses types. See `server/documentChecklists.ts`.
+2. ~~**`Home.tsx` line ~473** defaults to `"digital-nomad-visa"` when the recommendation label is not in `VISA_NAME_TO_PRODUCT_ID`.~~ **Closed in PR-2.** The handler now blocks navigation and shows a toast error when the recommendation cannot be mapped.
+3. ~~**Slug matchers in the four config files use different `slug.includes(...)` heuristics**, so the same `cases.visaType` value can be classified as EU in one place and Generic in another.~~ **Closed in PR-2.** All four matchers (`getRouteConfig`, `getCockpitConfig`, `resolveProductType`, `getIntakeRouteConfig`) now delegate to `resolveRouteGroup()` from `shared/visaRoutes.ts`. No `.includes()` heuristics remain.
+4. **`resolveDocumentType` in `documentRequirementConfig.ts` has no case for `employment_evidence`**, the document type used by the EU Registration checklist. EU users see a disabled, unexplained button on the intake page. The fix is to add the missing mappings. _(Out of scope for PR-2 — this is document-type resolution, not visa-route resolution. Tracked for a future PR.)_
 
 ---
 

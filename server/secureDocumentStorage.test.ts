@@ -167,4 +167,45 @@ describe("secureDocumentStorage", () => {
       expect(MAX_DOCUMENT_FILE_SIZE).toBe(20 * 1024 * 1024);
     });
   });
+
+  describe("no-silent-fallback contract (PR-1)", () => {
+    // Sensitive documents must only land in the private S3 bucket. When the
+    // storage layer is misconfigured, callers must see a clear failure — not a
+    // silent redirect to legacy storage. These tests pin the two surfaces that
+    // enforce that contract: the configuration probe and the canonical
+    // user-facing error string.
+
+    it("isSecureStorageConfigured returns false when only the secret key is missing", async () => {
+      delete process.env.AWS_SECRET_ACCESS_KEY;
+      const { isSecureStorageConfigured } = await import("./secureDocumentStorage");
+      expect(isSecureStorageConfigured()).toBe(false);
+    });
+
+    it("getS3Client throws a configuration error when env vars are missing", async () => {
+      delete process.env.AWS_S3_DOCUMENT_BUCKET;
+      const { generatePresignedUploadUrl } = await import("./secureDocumentStorage");
+      await expect(
+        generatePresignedUploadUrl({
+          storageKey: "cases/1/documents/passport/x.jpg",
+          contentType: "image/jpeg",
+        })
+      ).rejects.toThrow(/AWS S3 not configured/);
+    });
+
+    it("router error message matches the canonical user-facing string", async () => {
+      // The router throws this exact message; the client surfaces it verbatim.
+      // Keeping the two in lockstep prevents drift between server and UI.
+      const CANONICAL = "Secure upload is temporarily unavailable. Please try again or contact support.";
+      // Read the router source and confirm the literal is present in both guards.
+      const { readFileSync } = await import("node:fs");
+      const { resolve } = await import("node:path");
+      const routerSource = readFileSync(
+        resolve(__dirname, "./secureDocumentRouter.ts"),
+        "utf8"
+      );
+      const occurrences = routerSource.split(CANONICAL).length - 1;
+      // initUpload + completeUpload = 2
+      expect(occurrences).toBeGreaterThanOrEqual(2);
+    });
+  });
 });

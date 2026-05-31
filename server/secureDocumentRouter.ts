@@ -82,11 +82,12 @@ export const secureDocumentRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Validate secure storage is configured
+      // Validate secure storage is configured. Sensitive documents must only
+      // land in the private S3 bucket — there is no fallback to legacy storage.
       if (!isSecureStorageConfigured()) {
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: "Secure document storage is not configured. Please contact support.",
+          message: "Secure upload is temporarily unavailable. Please try again or contact support.",
         });
       }
 
@@ -206,6 +207,15 @@ export const secureDocumentRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Mirror the initUpload guard: if secure storage isn't configured, fail
+      // clearly rather than pretending the upload completed.
+      if (!isSecureStorageConfigured()) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Secure upload is temporarily unavailable. Please try again or contact support.",
+        });
+      }
+
       const db = await getDb();
       if (!db) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });

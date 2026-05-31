@@ -26,3 +26,27 @@ if (missing.length > 0) {
     throw new Error(`Missing critical environment variables: ${missing.join(", ")}`);
   }
 }
+
+// Boot-time validation of secure document storage (S3) configuration.
+// Required in production because the upload path no longer falls back to legacy
+// storage. See docs/document-storage-rules.md and docs/AWS_DOCUMENT_STORAGE_SETUP.md.
+const SECURE_STORAGE_VARS = [
+  "AWS_S3_DOCUMENT_BUCKET",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+] as const;
+
+const missingSecureStorage = SECURE_STORAGE_VARS.filter((key) => !process.env[key]);
+if (missingSecureStorage.length > 0) {
+  if (ENV.isProduction) {
+    console.error(
+      `[ENV] FATAL: Secure document storage not configured. Missing: ${missingSecureStorage.join(", ")}. See docs/AWS_DOCUMENT_STORAGE_SETUP.md.`
+    );
+    throw new Error(
+      `Secure document storage not configured in production. Missing: ${missingSecureStorage.join(", ")}`
+    );
+  }
+  console.warn(
+    `[ENV] Secure document storage not configured (missing: ${missingSecureStorage.join(", ")}). Document upload requests will fail with PRECONDITION_FAILED until these are set. See docs/AWS_DOCUMENT_STORAGE_SETUP.md.`
+  );
+}

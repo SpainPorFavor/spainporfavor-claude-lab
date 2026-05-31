@@ -190,23 +190,6 @@ export default function DocumentIntake() {
   const initUploadMutation = trpc.secureDocuments.initUpload.useMutation();
   const completeUploadMutation = trpc.secureDocuments.completeUpload.useMutation();
 
-  // ── Legacy base64 upload (auth path fallback) ──
-  const legacyUploadMutation = trpc.portal.uploadDocument.useMutation({
-    onSuccess: () => {
-      setUploadProgress("Document uploaded successfully.");
-      track("document_upload_completed", {
-        product_type: productType,
-        document_type: selectedDocumentType || "",
-        upload_method: "legacy",
-      });
-      setFlowState("success");
-    },
-    onError: (err) => {
-      setError(err.message || "Upload failed. Please try again.");
-      setFlowState("preview");
-    },
-  });
-
   // ── Public upload mutation (session-based) ──
   const publicUploadMutation = trpc.checkout.uploadDocumentBySession.useMutation({
     onSuccess: () => {
@@ -438,36 +421,16 @@ export default function DocumentIntake() {
       setUploadProgress("Document uploaded successfully.");
       track("document_upload_completed", { product_type: productType, document_type: docType });
       setFlowState("success");
-    } catch (presignedErr: any) {
-      // Fallback to legacy upload for first file
-      console.warn("[DocumentIntake] Presigned upload failed, falling back to legacy:", presignedErr.message);
-      try {
-        const slots = (activeCaseData as any).slots || [];
-        const targetSlot = slots.find((s: any) => {
-          const resolved = resolveDocumentType(s.documentType);
-          return resolved === selectedDocumentType;
-        }) || slots.find((s: any) => s.documentType === "passport" || s.documentType === "identity");
-
-        if (!targetSlot) {
-          setError("Could not find the document slot. Please contact support.");
-          setFlowState("preview");
-          return;
-        }
-
-        const buffer = await files[0].file.arrayBuffer();
-        const base64 = btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ""));
-
-        legacyUploadMutation.mutate({
-          slotId: targetSlot.id,
-          fileName: files[0].file.name,
-          fileData: base64,
-          mimeType: files[0].file.type,
-          fileSize: files[0].file.size,
-        });
-      } catch (legacyErr) {
-        setError("Your upload did not complete. Please try again.");
-        setFlowState("preview");
-      }
+    } catch (secureErr: any) {
+      // Secure storage failed. We do NOT fall back to legacy storage — sensitive
+      // documents must only land in the private S3 bucket. See docs/document-storage-rules.md.
+      track("document_upload_failed", {
+        product_type: productType,
+        document_type: docType,
+        reason: secureErr?.message || "unknown",
+      });
+      setError("Secure upload is temporarily unavailable. Please try again or contact support.");
+      setFlowState("preview");
     }
   };
 

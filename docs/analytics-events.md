@@ -48,6 +48,7 @@ These events are already emitted today. Names are stable; do not rename without 
 | `file_selected` | After file-picker selection | `product_type`, `document_type`, `file_count` |
 | `document_submit_for_review_clicked` | Preview-card submit | `product_type`, `document_type` |
 | `document_upload_completed` | Upload success (any path) | `product_type`, `document_type`, `upload_method?` |
+| `document_upload_failed` | Secure upload failed (no legacy fallback after PR-1). Emitted from `DocumentIntake.tsx` catch. | `product_type`, `document_type`, `reason` |
 | `back_to_checklist_clicked` | Back link | `product_type`, `document_type` |
 | `ask_laura_document_clicked` | Help link to Laura chat | `product_type`, `document_type` |
 | `template_downloaded` | (DNV employment template) | `document_type` |

@@ -1,8 +1,9 @@
 import Stripe from "stripe";
 import { Express, Request, Response } from "express";
-import { VISA_PRODUCTS } from "./products";
+import { getVisaProduct } from "./products";
 import { createCaseWithSlots, findCaseByStripeSessionId } from "./portalDb";
 import { queueWelcomeEmail } from "./emailNotifications";
+import { isPaidVisaProduct } from "../shared/visaRoutes";
 
 // Test mode keys — used when STRIPE_TEST_MODE=true
 const STRIPE_TEST_SK = "STRIPE_SECRET_KEY_PLACEHOLDER";
@@ -40,7 +41,7 @@ export async function createCheckoutSession(params: {
   origin: string;
   dependents?: number; // Number of dependents (spouse, children)
 }) {
-  const product = VISA_PRODUCTS[params.productId];
+  const product = getVisaProduct(params.productId);
   if (!product) {
     throw new Error(`Unknown product: ${params.productId}`);
   }
@@ -150,8 +151,19 @@ export function registerStripeWebhook(app: Express) {
               console.log(`[Stripe] Case already exists for session ${session.id}, skipping duplicate`);
               break;
             }
+            // Validate product_id against the canonical paid-product list.
+            // Unknown product ids must NOT silently become DNV cases —
+            // ACK the webhook (payment already succeeded) and log for ops
+            // to investigate manually. See docs/product-routes.md.
+            const rawProductId = metadata.product_id;
+            if (!isPaidVisaProduct(rawProductId)) {
+              console.error(
+                `[Stripe] Refusing to create case for checkout session ${session.id}: unknown product_id=${JSON.stringify(rawProductId)} customer_email=${metadata.customer_email || session.customer_email}. Case requires manual creation by ops.`
+              );
+              break;
+            }
             const caseId = await createCaseWithSlots({
-              visaType: metadata.product_id || "digital-nomad-visa",
+              visaType: rawProductId,
               clientName: metadata.customer_name || "Unknown",
               clientEmail: metadata.customer_email || session.customer_email || "",
               clientPhone: metadata.customer_phone || null,
@@ -181,6 +193,14 @@ export function registerStripeWebhook(app: Express) {
               const existingCase = await findCaseByStripeSessionId(paymentIntent.id);
               if (existingCase) {
                 console.log(`[Stripe] Case already exists for PaymentIntent ${paymentIntent.id}, skipping duplicate`);
+                break;
+              }
+              // Validate product_id against the canonical paid-product list.
+              // See checkout.session.completed branch above for the rationale.
+              if (!isPaidVisaProduct(meta.product_id)) {
+                console.error(
+                  `[Stripe] Refusing to create case for PaymentIntent ${paymentIntent.id}: unknown product_id=${JSON.stringify(meta.product_id)} customer_email=${meta.customer_email}. Case requires manual creation by ops.`
+                );
                 break;
               }
               const caseId = await createCaseWithSlots({
@@ -231,7 +251,7 @@ export async function createPaymentIntent(params: {
     postalCode: string;
   };
 }) {
-  const product = VISA_PRODUCTS[params.productId];
+  const product = getVisaProduct(params.productId);
   if (!product) {
     throw new Error(`Unknown product: ${params.productId}`);
   }

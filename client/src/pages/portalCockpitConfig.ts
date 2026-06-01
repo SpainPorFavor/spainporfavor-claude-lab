@@ -188,15 +188,18 @@ const genericCockpitConfig: CockpitRouteConfig = {
 // ============================================================
 // ROUTE RESOLVER
 // ============================================================
-const DNV_SLUGS = new Set(["digital-nomad-visa", "dnv", "visa-digital-nomad"]);
-const EU_SLUGS = new Set(["eu-registration", "eu-registration-certificate", "eu-certificate", "certificado-registro"]);
+// Single source of truth: shared/visaRoutes.ts. No local slug heuristics —
+// unknown visa types route to `genericCockpitConfig`, never silently to DNV.
+import { resolveRouteGroup } from "@shared/visaRoutes";
 
 export function getCockpitConfig(visaType: string | null | undefined): CockpitRouteConfig {
-  if (!visaType) return genericCockpitConfig;
-  const slug = visaType.toLowerCase().trim();
-  if (DNV_SLUGS.has(slug)) return dnvCockpitConfig;
-  if (EU_SLUGS.has(slug)) return euCockpitConfig;
-  if (slug.includes("nomad") || slug.includes("dnv")) return dnvCockpitConfig;
-  if (slug.includes("eu") && (slug.includes("reg") || slug.includes("certificado"))) return euCockpitConfig;
-  return genericCockpitConfig;
+  switch (resolveRouteGroup(visaType)) {
+    case "eu":
+      return euCockpitConfig;
+    case "dnv":
+      return dnvCockpitConfig;
+    case "generic":
+    case "unknown":
+      return genericCockpitConfig;
+  }
 }

@@ -233,17 +233,18 @@ const GENERIC_CONFIG: IntakeRouteConfig = {
   stickyCtaAfterUpload: "View Full Checklist",
 };
 
+// Source of truth: shared/visaRoutes.ts. No local display-name mappings —
+// unknown inputs route to GENERIC_CONFIG, never silently to DNV_CONFIG.
+import { resolveRouteGroup } from "@shared/visaRoutes";
+
 export function getIntakeRouteConfig(productId: string | null | undefined): IntakeRouteConfig {
-  if (!productId) return GENERIC_CONFIG;
-  switch (productId) {
-    case "eu-registration":
-    case "EU Registration Certificate":
+  switch (resolveRouteGroup(productId)) {
+    case "eu":
       return EU_REGISTRATION_CONFIG;
-    case "digital-nomad-visa":
-    case "Digital Nomad Visa (DNV)":
-    case "Digital Nomad Visa":
+    case "dnv":
       return DNV_CONFIG;
-    default:
+    case "generic":
+    case "unknown":
       return GENERIC_CONFIG;
   }
 }

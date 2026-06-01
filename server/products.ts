@@ -1,10 +1,17 @@
 /**
  * SpainPorFavor Visa Products — centralized pricing config
  * Prices in EUR cents
+ *
+ * The keys of VISA_PRODUCTS must match the PaidVisaProduct enum in
+ * shared/visaRoutes.ts. The `Record<PaidVisaProduct, …>` typing means
+ * TypeScript will fail compilation if a paid product is added to the
+ * shared enum without a price entry here (or vice versa).
  */
 
+import { isPaidVisaProduct, type PaidVisaProduct } from "../shared/visaRoutes";
+
 export interface VisaProduct {
-  id: string;
+  id: PaidVisaProduct;
   name: string;
   description: string;
   priceInCents: number;
@@ -13,7 +20,7 @@ export interface VisaProduct {
   dependentPriceInCents?: number;
 }
 
-export const VISA_PRODUCTS: Record<string, VisaProduct> = {
+export const VISA_PRODUCTS: Record<PaidVisaProduct, VisaProduct> = {
   "eu-registration": {
     id: "eu-registration",
     name: "EU Registration Certificate",
@@ -74,6 +81,16 @@ export const VISA_NAME_TO_PRODUCT_ID: Record<string, string> = {
   "Work Visa": "work-visa",
 };
 
+/**
+ * Look up a visa product by id. Returns undefined for unknown ids. Safer than
+ * indexing VISA_PRODUCTS directly because it never throws and never returns a
+ * silent DNV default.
+ */
+export function getVisaProduct(productId: string | null | undefined): VisaProduct | undefined {
+  if (!isPaidVisaProduct(productId)) return undefined;
+  return VISA_PRODUCTS[productId];
+}
+
 // Helper to get pricing summary for a visa with dependents
 export function getPricingSummary(productId: string, dependentCount: number): {
   mainPrice: number;
@@ -81,7 +98,7 @@ export function getPricingSummary(productId: string, dependentCount: number): {
   totalPrice: number;
   breakdown: string;
 } {
-  const product = VISA_PRODUCTS[productId];
+  const product = getVisaProduct(productId);
   if (!product) {
     return { mainPrice: 0, dependentPrice: 0, totalPrice: 0, breakdown: "" };
   }

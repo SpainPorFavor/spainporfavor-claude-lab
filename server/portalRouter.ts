@@ -25,6 +25,7 @@ import {
 } from "./portalDb";
 import type { CaseStatus, ValidationStatus } from "../drizzle/schema";
 import { fireCaseEvent } from "./eventMessaging";
+import { PAID_VISA_PRODUCTS } from "../shared/visaRoutes";
 
 export const portalRouter = router({
   // ============================================================
@@ -249,7 +250,11 @@ export const portalRouter = router({
   adminCreateCase: adminProcedure
     .input(
       z.object({
-        visaType: z.string(),
+        // Constrained to the 5 paid product slugs — see shared/visaRoutes.ts.
+        // Pre-PR-2 this accepted any string, so staff could type a display
+        // name like "EU Registration Certificate" and the case would
+        // silently receive a DNV checklist via the old default fallback.
+        visaType: z.enum(PAID_VISA_PRODUCTS),
         clientName: z.string().min(1),
         clientEmail: z.string().email(),
         clientPhone: z.string().optional(),

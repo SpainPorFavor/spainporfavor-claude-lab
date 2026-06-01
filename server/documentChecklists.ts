@@ -3,6 +3,8 @@
  * Used to auto-generate document slots when a case is created.
  */
 
+import type { PaidVisaProduct } from "../shared/visaRoutes";
+
 export interface DocumentSlotTemplate {
   documentType: string;
   label: string;
@@ -416,31 +418,35 @@ const EU_REGISTRATION_CHECKLIST: DocumentSlotTemplate[] = [
 ];
 
 /**
- * Get the document checklist for a given visa type.
+ * Get the document checklist for a given paid visa product.
+ *
+ * The parameter is typed as `PaidVisaProduct` (the canonical 5-slug enum from
+ * shared/visaRoutes.ts) — not a free `string`. This means:
+ *
+ *   - Display names like "Digital Nomad Visa (DNV)" cannot be passed here
+ *     without an explicit cast (and callers must validate first).
+ *   - Adding a new paid product without updating this switch is a compile error
+ *     via the `never` narrowing in the default branch.
+ *   - The previous "default to DNV" fallback is gone.
+ *
+ * Runtime defence-in-depth: if a caller bypasses the type system via cast,
+ * the function throws rather than silently returning DNV.
  */
-export function getChecklistForVisaType(visaType: string): DocumentSlotTemplate[] {
-  switch (visaType) {
+export function getChecklistForVisaType(product: PaidVisaProduct): DocumentSlotTemplate[] {
+  switch (product) {
     case "digital-nomad-visa":
-    case "Digital Nomad Visa (DNV)":
-    case "Digital Nomad Visa":
       return DNV_CHECKLIST;
     case "non-lucrative-visa":
-    case "Non-Lucrative Visa (NLV)":
-    case "Non-Lucrative Visa":
       return NLV_CHECKLIST;
     case "student-visa":
-    case "Student Visa (Estancia por Estudios)":
-    case "Student Visa":
       return STUDENT_CHECKLIST;
     case "work-visa":
-    case "Work Visa (Autorización Cuenta Ajena)":
-    case "Work Visa":
       return WORK_VISA_CHECKLIST;
     case "eu-registration":
-    case "EU Registration Certificate":
       return EU_REGISTRATION_CHECKLIST;
-    default:
-      // Default to DNV checklist as it's the most common
-      return DNV_CHECKLIST;
+    default: {
+      const _exhaustive: never = product;
+      throw new Error(`Unknown visa product: ${JSON.stringify(_exhaustive)}`);
+    }
   }
 }

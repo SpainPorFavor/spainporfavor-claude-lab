@@ -326,8 +326,8 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        const { VISA_PRODUCTS } = await import("./products");
-        const product = VISA_PRODUCTS[input.productId];
+        const { getVisaProduct } = await import("./products");
+        const product = getVisaProduct(input.productId);
         if (!product) throw new TRPCError({ code: "BAD_REQUEST", message: "Unknown product" });
         const amountInCents = product.priceInCents + (product.dependentPriceInCents || 0) * input.dependents;
         const result = await createPaymentIntent({

@@ -523,13 +523,20 @@ export function getStickyCTAText(docType: string): string {
 }
 
 // --- Map productType string from backend to our enum ---
+// Source of truth: shared/visaRoutes.ts. No local slug heuristics — unknown
+// inputs return "generic", never silently "digital-nomad-visa".
+import { resolveRouteGroup } from "@shared/visaRoutes";
 
 export function resolveProductType(raw: string | undefined | null): ProductType {
-  if (!raw) return "generic";
-  const lower = raw.toLowerCase().replace(/[\s_]+/g, "-");
-  if (lower.includes("eu") && lower.includes("reg")) return "eu-registration";
-  if (lower.includes("digital") || lower.includes("nomad") || lower.includes("dnv")) return "digital-nomad-visa";
-  return "generic";
+  switch (resolveRouteGroup(raw)) {
+    case "eu":
+      return "eu-registration";
+    case "dnv":
+      return "digital-nomad-visa";
+    case "generic":
+    case "unknown":
+      return "generic";
+  }
 }
 
 // --- Map documentType string from backend slot to our enum ---

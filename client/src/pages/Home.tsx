@@ -470,7 +470,19 @@ export default function Home() {
   const handleSubmitApplication = (e: React.FormEvent) => {
     e.preventDefault();
     if (!appName || !appPhone || !email) return;
-    const productId = VISA_NAME_TO_PRODUCT_ID[recommendation.visa] || "digital-nomad-visa";
+    // Resolve the quiz recommendation display name to a canonical product slug.
+    // No silent DNV default — if the recommendation isn't in the explicit map,
+    // block navigation and surface a clear error. See docs/product-routes.md.
+    const productId = VISA_NAME_TO_PRODUCT_ID[recommendation.visa];
+    if (!productId) {
+      console.error(
+        `[Home] Unmapped visa recommendation: ${JSON.stringify(recommendation.visa)}. Refusing to route to /order with a DNV default.`
+      );
+      toast.error(
+        "We couldn't determine your visa type. Please retake the quiz or contact support."
+      );
+      return;
+    }
     // Determine dependents from quiz answer
     const whoMoving = answers[4]; // solo, partner, family
     const dependents = whoMoving === "partner" ? 1 : whoMoving === "family" ? 2 : 0;

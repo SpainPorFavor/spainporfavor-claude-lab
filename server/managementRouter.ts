@@ -1230,9 +1230,19 @@ export const managementRouter = router({
         if (!lead) throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
         if (lead.linkedCaseId) throw new TRPCError({ code: "BAD_REQUEST", message: "Lead already has a linked case" });
 
+        // Validate visa type before conversion — do NOT silently default to
+        // DNV. If the lead has no recognised visa type, ops must assign one
+        // before converting. See docs/product-routes.md.
+        const { isPaidVisaProduct } = await import("../shared/visaRoutes");
+        if (!isPaidVisaProduct(lead.visaType)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Lead has no recognised visa product (got: ${JSON.stringify(lead.visaType)}). Please assign a valid visa type to the lead before converting it to a case.`,
+          });
+        }
         const { createCaseWithSlots } = await import("./portalDb");
         const caseId = await createCaseWithSlots({
-          visaType: lead.visaType || "digital-nomad-visa",
+          visaType: lead.visaType,
           clientName: lead.name || lead.email.split("@")[0],
           clientEmail: lead.email,
           clientPhone: lead.phone || null,

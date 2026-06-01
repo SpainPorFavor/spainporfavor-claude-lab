@@ -1,7 +1,12 @@
 /**
  * Route-specific configuration for the Portal Application Cockpit.
  * Each visa route gets its own copy, document groupings, and next-best-action logic.
+ *
+ * Shared route facts (caseIdPrefix / routePrefix and displayLabel / routeLabel)
+ * live in shared/visaRoutes.ts under ROUTE_METADATA — consumed below so the
+ * same fact isn't duplicated across this file and activationRouteConfig.ts.
  */
+import { ROUTE_METADATA } from "@shared/visaRoutes";
 
 // Document group — logical grouping for the checklist UI
 export interface DocumentGroup {
@@ -41,8 +46,8 @@ export interface CockpitRouteConfig {
 // DNV CONFIG
 // ============================================================
 const dnvCockpitConfig: CockpitRouteConfig = {
-  routeLabel: "Digital Nomad Visa",
-  routePrefix: "SPF-DNV",
+  routeLabel: ROUTE_METADATA.dnv.displayLabel,
+  routePrefix: ROUTE_METADATA.dnv.caseIdPrefix,
   heroHeadline: "Your Digital Nomad Visa Application",
   heroSubheadline: "Upload your documents below. Your Gestor will review everything once the checklist is complete.",
   privacyIntro: "We need to process your documents to prepare and review your application. Please review the summary below before continuing.",
@@ -95,8 +100,8 @@ const dnvCockpitConfig: CockpitRouteConfig = {
 // EU REGISTRATION CONFIG
 // ============================================================
 const euCockpitConfig: CockpitRouteConfig = {
-  routeLabel: "EU Registration Certificate",
-  routePrefix: "SPF-EU",
+  routeLabel: ROUTE_METADATA.eu.displayLabel,
+  routePrefix: ROUTE_METADATA.eu.caseIdPrefix,
   heroHeadline: "Your EU Registration Application",
   heroSubheadline: "Upload your documents below. The process is simpler than you think — most clients finish in one sitting.",
   privacyIntro: "We need to process your documents to prepare and review your application. Please review the summary below before continuing.",
@@ -149,8 +154,8 @@ const euCockpitConfig: CockpitRouteConfig = {
 // GENERIC FALLBACK
 // ============================================================
 const genericCockpitConfig: CockpitRouteConfig = {
-  routeLabel: "Visa Application",
-  routePrefix: "SPF",
+  routeLabel: ROUTE_METADATA.generic.displayLabel,
+  routePrefix: ROUTE_METADATA.generic.caseIdPrefix,
   heroHeadline: "Your Visa Application",
   heroSubheadline: "Upload your documents below. Your Gestor will review everything once the checklist is complete.",
   privacyIntro: "We need to process your documents to prepare and review your application. Please review the summary below before continuing.",

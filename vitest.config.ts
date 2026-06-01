@@ -19,6 +19,10 @@ export default defineConfig({
       "server/**/*.spec.ts",
       "shared/**/*.test.ts",
       "shared/**/*.spec.ts",
+      // Pure-data client config tests (no React rendering) — included so
+      // cross-config consistency checks run with the rest of the suite.
+      "client/src/**/*.test.ts",
+      "client/src/**/*.spec.ts",
     ],
   },
 });

@@ -2,7 +2,9 @@
 
 > The funnel branches on visa product. This document is the single source of truth for those branches. **EU Registration and Digital Nomad Visa are never to be conflated**, in code or in copy.
 >
-> **Code source of truth: `shared/visaRoutes.ts`** (introduced in PR-2). All slug matchers, checklist generators, and case-creation entry points use the resolver and type-guard exported from that module. Do not add new slug heuristics elsewhere.
+> **Code source of truth: `shared/visaRoutes.ts`** (introduced in PR-2, extended in PR-3). All slug matchers, checklist generators, and case-creation entry points use the resolver and type-guard exported from that module. Do not add new slug heuristics elsewhere.
+>
+> **Shared route metadata** (`ROUTE_METADATA` in `shared/visaRoutes.ts`, introduced in PR-3): the `caseIdPrefix` and `displayLabel` that must agree across `activationRouteConfig.ts` and `portalCockpitConfig.ts` live in one place. The two configs import from it; cross-config drift is prevented by both the type system and by the consistency tests in `client/src/pages/routeConfigConsistency.test.ts`.
 
 ---
 

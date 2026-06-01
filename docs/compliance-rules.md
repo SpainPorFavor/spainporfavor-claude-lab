@@ -11,6 +11,8 @@
 
 ---
 
+> **PR-4 status:** the marketing surfaces of the funnel (`Home.tsx`, `About.tsx`, `OrderForm.tsx`, `ApplicationSuccess.tsx`, `AssessmentChat.tsx`, the chat-advisor system prompts in `server/routers.ts`, and `server/leadDripEmails.ts`) have been swept for the forbidden claims below. A grep-based sweep test (`client/src/pages/noForbiddenClaims.test.ts`) runs with the suite and fails CI if a forbidden phrase is reintroduced. Legal pages (`PrivacyPolicy.tsx`, `CookiePolicy.tsx`, `GDPRCompliance.tsx`) are intentionally excluded from the marketing sweep — those are substantive legal notices.
+
 ## 1. Forbidden Claims (must not appear anywhere in code, UI, copy, or chat output)
 
 | Claim | Why forbidden | What to say instead |

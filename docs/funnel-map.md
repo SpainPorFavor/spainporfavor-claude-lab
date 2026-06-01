@@ -64,6 +64,19 @@ These exist and must keep working, but the Claude rebuild does not redesign them
 
 ---
 
+## PR-4 changes to user-facing actions
+
+The trust-and-compliance cleanup PR (PR-4) removed or replaced four user-facing actions because they pretended to do something the backend didn't actually do:
+
+| Action (pre-PR-4) | Post-PR-4 |
+|---|---|
+| "Resend my portal link" button → `alert("Portal link has been resent…")` with no backend call | Removed. Combined with the receipt link into one honest support link: *"Need a portal link or receipt? Contact support"* (mailto). |
+| "Download receipt" mailto disguised as a download | Removed (same support link as above). |
+| Promo-code form on `/order` that toasted "Contact us for discount codes" without applying anything | Replaced with a single text link: *"Have a promo code? Contact support before payment."* |
+| SMS / WhatsApp reminder checkbox on `/application-success` that stored consent in React state only | Disabled placeholder with copy: *"SMS or WhatsApp reminders are not available yet."* No consent is captured. |
+
+The 5-step activation model, the funnel routes, and the data carried between steps were not changed.
+
 ## Non-Goals of the Funnel Rebuild
 
 - **Do not introduce a new step between payment and upload.** No "verify your email", no "schedule a consultation", no "create an account" gate.

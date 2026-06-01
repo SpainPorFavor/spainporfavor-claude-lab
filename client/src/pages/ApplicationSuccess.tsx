@@ -10,7 +10,6 @@ import {
   Lock,
   Calendar,
   Mail,
-  Download,
   ArrowRight,
   Circle,
   HelpCircle,
@@ -99,9 +98,6 @@ export default function ApplicationSuccess() {
     { sessionId },
     { enabled: !!data?.verified, retry: 2, staleTime: Infinity }
   );
-
-  // ── WhatsApp consent state ──
-  const [whatsappOptIn, setWhatsappOptIn] = useState(false);
 
   // ── Sticky CTA visibility ──
   const [showStickyCta, setShowStickyCta] = useState(false);
@@ -264,24 +260,20 @@ export default function ApplicationSuccess() {
               <Calendar className="w-3.5 h-3.5 inline mr-1" />
               Book a 15-minute kickoff call
             </a>
-            <button
+            {/*
+              PR-4: Removed two fake actions — a "resend portal link" button
+              that showed a false success alert without calling any backend,
+              and a mailto link disguised as a receipt download. Both are
+              replaced with a single honest support link until a real resend
+              endpoint and a real Stripe receipt URL are wired up.
+            */}
+            <a
+              href={`mailto:support@spainporfavor.com?subject=Help with my SpainPorFavor case - ${sessionId}`}
               className="text-muted-foreground hover:text-[#1A2332] underline underline-offset-2"
-              onClick={() => {
-                trackEvent("portal_link_resend_clicked", { product_type: data.productId || "" });
-                // TODO: connect to backend resend endpoint
-                alert("Portal link has been resent to your email.");
-              }}
+              onClick={() => trackEvent("support_clicked", { product_type: data.productId || "" })}
             >
               <Mail className="w-3.5 h-3.5 inline mr-1" />
-              Resend my portal link
-            </button>
-            <a
-              href={`mailto:support@spainporfavor.com?subject=Receipt request - ${sessionId}`}
-              className="text-muted-foreground hover:text-[#1A2332] underline underline-offset-2"
-              onClick={() => trackEvent("receipt_download_clicked", { product_type: data.productId || "" })}
-            >
-              <Download className="w-3.5 h-3.5 inline mr-1" />
-              Download receipt
+              Need a portal link or receipt? Contact support
             </a>
           </div>
         </section>
@@ -426,32 +418,28 @@ export default function ApplicationSuccess() {
         </section>
 
         {/* ── SECTION 8: Communication Preferences ── */}
-        {/* TODO: Hide this section until consent persistence is implemented on backend */}
+        {/*
+          PR-4: The previous SMS/WhatsApp opt-in stored consent in React state
+          only — the checkbox cleared on reload and no consent row was written.
+          Until a real consent-persistence flow exists, this section is shown
+          as a disabled placeholder so we don't capture consent we can't honour.
+        */}
         <section className="mb-10">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 opacity-70">
             <h3 className="font-display text-base font-bold text-[#1A2332] mb-3">
               Get case reminders
             </h3>
-            <label className="flex items-start gap-3 cursor-pointer">
+            <label className="flex items-start gap-3">
               <input
                 type="checkbox"
-                checked={whatsappOptIn}
-                onChange={(e) => {
-                  setWhatsappOptIn(e.target.checked);
-                  if (e.target.checked) {
-                    trackEvent("sms_whatsapp_optin_checked", { product_type: data.productId || "" });
-                  }
-                  // TODO: persist consent via backend when checked
-                }}
-                className="mt-1 w-4 h-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                disabled
+                aria-label="SMS or WhatsApp reminders — not available yet"
+                className="mt-1 w-4 h-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 cursor-not-allowed"
               />
               <span className="text-sm text-[#1A2332]">
-                Send me SMS or WhatsApp reminders about missing documents, appointment steps, and case updates.
+                SMS or WhatsApp reminders are not available yet. Service-critical email updates will still be sent.
               </span>
             </label>
-            <p className="text-xs text-muted-foreground mt-2 ml-7">
-              You can opt out at any time. Service-critical email updates will still be sent.
-            </p>
           </div>
         </section>
 

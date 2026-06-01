@@ -46,28 +46,28 @@ const PRODUCT_INFO: Record<string, { name: string; price: number; depPrice: numb
     price: 699,
     depPrice: 399,
     timeline: "4–6 weeks",
-    features: ["Expert document preparation", "Licensed Gestor submission", "48-hour document review", "Free resubmission guarantee", "Dedicated case manager"],
+    features: ["Expert document preparation", "Licensed Gestor submission", "48-hour document review", "Free resubmission support (fixable issues, subject to our terms)", "Dedicated case manager"],
   },
   "non-lucrative-visa": {
     name: "Non-Lucrative Visa (NLV)",
     price: 649,
     depPrice: 349,
     timeline: "6–8 weeks",
-    features: ["Expert document preparation", "Licensed Gestor submission", "48-hour document review", "Free resubmission guarantee", "Dedicated case manager"],
+    features: ["Expert document preparation", "Licensed Gestor submission", "48-hour document review", "Free resubmission support (fixable issues, subject to our terms)", "Dedicated case manager"],
   },
   "student-visa": {
     name: "Student Visa",
     price: 549,
     depPrice: 0,
     timeline: "4–6 weeks",
-    features: ["Expert document preparation", "Licensed Gestor submission", "48-hour document review", "Free resubmission guarantee", "Dedicated case manager"],
+    features: ["Expert document preparation", "Licensed Gestor submission", "48-hour document review", "Free resubmission support (fixable issues, subject to our terms)", "Dedicated case manager"],
   },
   "work-visa": {
     name: "Work Visa",
     price: 799,
     depPrice: 449,
     timeline: "8–12 weeks",
-    features: ["Expert document preparation", "Licensed Gestor submission", "Employer sponsorship guidance", "Free resubmission guarantee", "Dedicated case manager"],
+    features: ["Expert document preparation", "Licensed Gestor submission", "Employer sponsorship guidance", "Free resubmission support (fixable issues, subject to our terms)", "Dedicated case manager"],
   },
 };
 
@@ -158,8 +158,6 @@ function PaymentForm() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [promoOpen, setPromoOpen] = useState(false);
-  const [promoCode, setPromoCode] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -299,7 +297,7 @@ function PaymentForm() {
           </a>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Lock className="w-3.5 h-3.5" />
-            <span>256-bit SSL Encrypted</span>
+            <span>Secure checkout</span>
           </div>
         </div>
       </header>
@@ -388,15 +386,17 @@ function PaymentForm() {
                 <p className="text-[13px] font-medium text-slate-600">— Sarah M., Digital Nomad Visa</p>
               </div>
 
-              {/* Trust badges */}
+              {/* Trust badges — PR-4: replaced the GDPR badge and the
+                  unsupported numeric approval-rate badge with non-numeric,
+                  factual trust signals. See docs/compliance-rules.md. */}
               <div className="mt-5 flex items-center justify-center gap-4 text-[13px] text-slate-400">
                 <span className="flex items-center gap-1">
                   <Shield className="w-3.5 h-3.5" />
-                  GDPR Compliant
+                  Secure document handling
                 </span>
                 <span className="flex items-center gap-1">
                   <BadgeCheck className="w-3.5 h-3.5" />
-                  98.7% Approval Rate
+                  Licensed Gestor support
                 </span>
               </div>
             </div>
@@ -547,35 +547,17 @@ function PaymentForm() {
                 </div>
               </div>
 
-              {/* Promo Code */}
+              {/* Promo Code — PR-4: the on-site PaymentIntent flow does not
+                  support promo codes natively (only Stripe Checkout Session
+                  does). Showing a form that cannot apply a discount was
+                  misleading, so it has been replaced with a support link. */}
               <div>
-                {!promoOpen ? (
-                  <button
-                    type="button"
-                    onClick={() => setPromoOpen(true)}
-                    className="text-sm text-slate-500 hover:text-amber-600 underline underline-offset-4 transition-colors"
-                  >
-                    Have a promo code?
-                  </button>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="Enter promo code"
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toast.info("Promo codes are applied at Stripe level. Contact us for discount codes.")}
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                )}
+                <a
+                  href="mailto:support@spainporfavor.com?subject=Promo code request"
+                  className="text-sm text-slate-500 hover:text-amber-600 underline underline-offset-4 transition-colors"
+                >
+                  Have a promo code? Contact support before payment.
+                </a>
               </div>
 
               {/* Submit Button */}

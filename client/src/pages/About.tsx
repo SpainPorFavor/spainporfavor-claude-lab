@@ -119,10 +119,13 @@ export default function About() {
       {/* Key Facts */}
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
+          {/* PR-4: removed the unsupported numeric approval-rate stat —
+              replaced with a non-numeric trust signal. See
+              docs/compliance-rules.md. */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-[#F59E0B]">98.7%</div>
-              <div className="text-sm text-gray-600 mt-1">Approval rate</div>
+              <div className="text-3xl font-bold text-[#F59E0B]">Gestor</div>
+              <div className="text-sm text-gray-600 mt-1">Licensed submission</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-[#F59E0B]">4–6</div>
@@ -242,21 +245,18 @@ export default function About() {
             <div className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg">
               <Shield className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-sm text-[#1A2332]">GDPR Compliant</h3>
+                <h3 className="font-semibold text-sm text-[#1A2332]">Data protection</h3>
                 <p className="text-sm text-gray-600">
-                  Registered as a data processor with the Spanish Data Protection Agency (AEPD). All
-                  documents encrypted at rest (AES-256) and in transit (TLS 1.3).
+                  Documents are stored in a private bucket in the EU, encrypted at rest, and accessed only by authorised case staff. See our Privacy Policy for the full data-protection notice and your rights.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg">
               <Shield className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-sm text-[#1A2332]">Free Resubmission Guarantee</h3>
+                <h3 className="font-semibold text-sm text-[#1A2332]">Free resubmission support</h3>
                 <p className="text-sm text-gray-600">
-                  If your application is rejected, we resubmit at no additional cost. If we
-                  determine the rejection cannot be overcome, we refund your fee minus government
-                  filing costs.
+                  If your application is rejected for fixable document reasons, we resubmit at no additional cost, subject to our terms. If we determine the rejection cannot be overcome, we refund your fee minus government filing costs.
                 </p>
               </div>
             </div>

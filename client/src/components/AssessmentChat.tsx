@@ -603,8 +603,8 @@ export default function AssessmentChat({
             <ArrowRight className="w-4 h-4" />
           </button>
           <p className="text-center text-xs text-muted-foreground mt-1.5">
-            Includes document prep, Gestor submission, and free resubmission if
-            rejected.
+            Includes document prep, Gestor submission, and free resubmission
+            support for fixable issues (subject to our terms).
           </p>
         </div>
       )}

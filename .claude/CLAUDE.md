@@ -60,15 +60,18 @@ These rules override anything else in this repo. If a rule conflicts with a task
 
 ## 4. Skills Available
 
-When a task fits one of these skills, use it (or invoke the corresponding agent prompt):
+When a task fits one of these skills, use it (or invoke the corresponding agent prompt). Several skills can apply to the same change — invoke whichever ones cover the surface you're touching.
 
 | Skill | When to use |
 |---|---|
-| `spf-visual-director` | Any visual / UX / copy / design-token change to the funnel pages. |
-| `spf-funnel-architect` | Any routing, product-route resolution, checklist, or 5-step activation change. |
-| `spf-secure-documents` | Any upload, storage, presigned-URL, encryption, retention, or audit-log change. |
+| `spf-visual-director` | Overall UI / UX / copy direction across the funnel. The umbrella for any visual change. |
+| `spf-premium-brand-system` | Visual identity, design tokens, typography, spacing, cards, buttons, shadows, status colours. Polish at the component level. |
+| `spf-conversion-ui` | Funnel page hierarchy, CTA discipline, single-primary-CTA rule, route-specific copy, the 5-step activation contract on success/intake/portal. |
+| `spf-mobile-cx-accessibility` | Mobile-first layout, sticky CTAs, tap targets, focus states, forms, modals, loading/empty/error states, accessibility (semantic headings, aria, keyboard). |
+| `spf-funnel-architect` | Routing, product-route resolution, checklist logic, case-creation choke points, the canonical 5-step contract. |
+| `spf-secure-documents` | Upload, storage, presigned URLs, encryption, retention, audit logs, AI document validation. |
 
-Skill files live at `.claude/skills/<skill-name>/SKILL.md`.
+Skill files live at `.claude/skills/<skill-name>/SKILL.md`. Each file declares its scope under "When this skill applies" and "When this skill does NOT apply".
 
 ---
 

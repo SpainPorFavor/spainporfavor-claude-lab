@@ -19,7 +19,7 @@ There is **one** document storage destination going forward: the private AWS S3 
 
 The legacy path through `server/storage.ts` (`storagePut` → Manus Forge) is being retired. **Do not write new code that uploads documents through it.** The existing references will be removed by the rebuild PRs.
 
-The current code has a silent fallback (DocumentIntake.tsx tries S3, then falls back to the legacy path on any error). This is a known bug. The fallback must be removed: if S3 is unavailable, the upload fails loudly.
+The silent fallback on the authenticated intake path was removed in **PR-1** (`claude/pr-1-secure-upload-no-silent-fallback`). `DocumentIntake.tsx` no longer falls back to the legacy path; if the secure upload fails, the user sees: *"Secure upload is temporarily unavailable. Please try again or contact support."* and the file is not written anywhere else. The public post-payment path (`uploadDocumentBySession`) and the Portal upload modal (`portal.uploadDocument`) still write to legacy storage as their primary path — they are not fallbacks and will be migrated in a later PR.
 
 ---
 

@@ -14,6 +14,8 @@ import {
   resolveVisaRoute,
   routeGroupOf,
   resolveRouteGroup,
+  ROUTE_METADATA,
+  getRouteMetadata,
   type VisaRoute,
 } from "./visaRoutes";
 
@@ -185,5 +187,58 @@ describe("exhaustiveness (compile-time guarantee)", () => {
       const group = routeGroupOf(route as VisaRoute);
       expect(["eu", "dnv", "generic", "unknown"]).toContain(group);
     }
+  });
+});
+
+describe("ROUTE_METADATA", () => {
+  it("has an entry for every RouteGroup", () => {
+    expect(ROUTE_METADATA.eu).toBeDefined();
+    expect(ROUTE_METADATA.dnv).toBeDefined();
+    expect(ROUTE_METADATA.generic).toBeDefined();
+    expect(ROUTE_METADATA.unknown).toBeDefined();
+  });
+
+  it("eu uses SPF-EU and 'EU Registration Certificate'", () => {
+    expect(ROUTE_METADATA.eu.caseIdPrefix).toBe("SPF-EU");
+    expect(ROUTE_METADATA.eu.displayLabel).toBe("EU Registration Certificate");
+  });
+
+  it("dnv uses SPF-DNV and 'Digital Nomad Visa'", () => {
+    expect(ROUTE_METADATA.dnv.caseIdPrefix).toBe("SPF-DNV");
+    expect(ROUTE_METADATA.dnv.displayLabel).toBe("Digital Nomad Visa");
+  });
+
+  it("generic and unknown share the same neutral metadata (so unknown never claims a specific visa)", () => {
+    expect(ROUTE_METADATA.generic.caseIdPrefix).toBe("SPF");
+    expect(ROUTE_METADATA.generic.displayLabel).toBe("Visa Application");
+    expect(ROUTE_METADATA.unknown.caseIdPrefix).toBe(ROUTE_METADATA.generic.caseIdPrefix);
+    expect(ROUTE_METADATA.unknown.displayLabel).toBe(ROUTE_METADATA.generic.displayLabel);
+  });
+
+  it("unknown metadata never displays as DNV", () => {
+    expect(ROUTE_METADATA.unknown.caseIdPrefix).not.toBe(ROUTE_METADATA.dnv.caseIdPrefix);
+    expect(ROUTE_METADATA.unknown.displayLabel).not.toBe(ROUTE_METADATA.dnv.displayLabel);
+  });
+});
+
+describe("getRouteMetadata", () => {
+  it("returns the EU metadata for eu-registration", () => {
+    expect(getRouteMetadata("eu-registration")).toBe(ROUTE_METADATA.eu);
+  });
+
+  it("returns the DNV metadata for digital-nomad-visa", () => {
+    expect(getRouteMetadata("digital-nomad-visa")).toBe(ROUTE_METADATA.dnv);
+  });
+
+  it("returns the generic metadata for NLV / Student / Work", () => {
+    expect(getRouteMetadata("non-lucrative-visa")).toBe(ROUTE_METADATA.generic);
+    expect(getRouteMetadata("student-visa")).toBe(ROUTE_METADATA.generic);
+    expect(getRouteMetadata("work-visa")).toBe(ROUTE_METADATA.generic);
+  });
+
+  it("returns the unknown metadata for null/unmapped (NOT the DNV metadata)", () => {
+    expect(getRouteMetadata(null)).toBe(ROUTE_METADATA.unknown);
+    expect(getRouteMetadata("Digital Nomad Visa (DNV)")).toBe(ROUTE_METADATA.unknown);
+    expect(getRouteMetadata(null)).not.toBe(ROUTE_METADATA.dnv);
   });
 });

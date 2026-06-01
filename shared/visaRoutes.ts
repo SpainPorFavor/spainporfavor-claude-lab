@@ -91,3 +91,48 @@ export function routeGroupOf(route: VisaRoute): RouteGroup {
 export function resolveRouteGroup(input: string | null | undefined): RouteGroup {
   return routeGroupOf(resolveVisaRoute(input));
 }
+
+/**
+ * Shared per-RouteGroup facts that must agree across the four UI configs.
+ *
+ *   caseIdPrefix — used in the case ID rendered on /application-success
+ *     and /portal. Activation and cockpit configs previously hardcoded this
+ *     in two places; PR-3 consolidates so drift is impossible.
+ *   displayLabel — short brand-aligned label for the route, shown in
+ *     headers and case-snapshot cards.
+ *
+ * Keep these intentionally short and non-marketing. Page-specific headlines,
+ * subheadlines, and microcopy stay in their respective config files because
+ * each surface needs different framing.
+ */
+export interface RouteMetadata {
+  caseIdPrefix: string;
+  displayLabel: string;
+}
+
+export const ROUTE_METADATA: Record<RouteGroup, RouteMetadata> = {
+  eu: {
+    caseIdPrefix: "SPF-EU",
+    displayLabel: "EU Registration Certificate",
+  },
+  dnv: {
+    caseIdPrefix: "SPF-DNV",
+    displayLabel: "Digital Nomad Visa",
+  },
+  generic: {
+    caseIdPrefix: "SPF",
+    displayLabel: "Visa Application",
+  },
+  unknown: {
+    // Unknown gets the same surface as generic — copy is intentionally
+    // non-specific so a case whose visaType could not be classified renders
+    // safely without claiming a product the user did not buy.
+    caseIdPrefix: "SPF",
+    displayLabel: "Visa Application",
+  },
+};
+
+/** Look up the metadata for a raw input string. Resolves through the canonical resolver. */
+export function getRouteMetadata(input: string | null | undefined): RouteMetadata {
+  return ROUTE_METADATA[resolveRouteGroup(input)];
+}

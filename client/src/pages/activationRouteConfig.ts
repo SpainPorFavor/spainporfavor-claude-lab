@@ -2,7 +2,12 @@
  * Route-specific content configuration for the Case Activation Page.
  * Each route (DNV, EU Registration, Generic) has its own hero, stepper,
  * checklist, blocker cards, and copy.
+ *
+ * Shared route facts (caseIdPrefix, displayLabel) live in
+ * shared/visaRoutes.ts under ROUTE_METADATA — consumed below so the same
+ * fact isn't duplicated across this file and portalCockpitConfig.ts.
  */
+import { ROUTE_METADATA } from "@shared/visaRoutes";
 
 export type StepStatus = "complete" | "current" | "next" | "goal";
 
@@ -80,7 +85,7 @@ const dnvConfig: RouteConfig = {
       note: "Final decisions depend on official requirements, appointment availability, and the competent Spanish authority.",
     },
   ],
-  caseIdPrefix: "SPF-DNV",
+  caseIdPrefix: ROUTE_METADATA.dnv.caseIdPrefix,
   checklistTitle: "Start with your passport",
   checklistIntro:
     "You do not need to upload everything right now. Start with your passport. Your full checklist will be confirmed inside your portal based on where you are applying from.",
@@ -167,7 +172,7 @@ const euConfig: RouteConfig = {
       note: "Final issuance depends on official requirements, appointment availability, and your completed documents.",
     },
   ],
-  caseIdPrefix: "SPF-EU",
+  caseIdPrefix: ROUTE_METADATA.eu.caseIdPrefix,
   checklistTitle: "Start with your passport or EU national ID",
   checklistIntro:
     "You do not need to upload everything right now. Start with your passport or EU national ID. Your full checklist will be confirmed inside your portal based on your situation.",
@@ -251,7 +256,7 @@ const genericConfig: RouteConfig = {
       note: "Final outcomes depend on official requirements, appointment availability, and your completed documents.",
     },
   ],
-  caseIdPrefix: "SPF",
+  caseIdPrefix: ROUTE_METADATA.generic.caseIdPrefix,
   checklistTitle: "Start with your first document",
   checklistIntro:
     "You do not need to upload everything right now. Start with your passport or primary identity document. Your full checklist will be confirmed inside your portal.",

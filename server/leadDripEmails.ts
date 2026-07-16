@@ -7,6 +7,7 @@ import { eq, and, lte, gte, inArray, isNull, ne } from "drizzle-orm";
 import { getDb } from "./db";
 import { leads, emailQueue } from "../drizzle/schema";
 import { sendProspectEmail } from "./gmailService";
+import { isEmailAutomationPaused } from "./emailAutomation";
 
 const SCAN_INTERVAL_MS = 2 * 60 * 60 * 1000; // 2 hours
 let scanInterval: ReturnType<typeof setInterval> | null = null;
@@ -84,6 +85,12 @@ async function hasDripBeenSent(db: any, email: string, stepKey: string): Promise
  * Main drip scan: find leads eligible for each drip step and send emails.
  */
 export async function runLeadDripScan(): Promise<{ sent: number; errors: number }> {
+  // Kill switch: skip the entire drip scan when email automation is paused.
+  if (isEmailAutomationPaused()) {
+    console.log("[LeadDrip] EMAIL_AUTOMATION_PAUSED=true — skipping drip scan, no emails sent");
+    return { sent: 0, errors: 0 };
+  }
+
   const db = await getDb();
   if (!db) {
     console.log("[LeadDrip] Database unavailable, skipping scan");

@@ -24,6 +24,7 @@ import {
 } from "../drizzle/schema";
 import { eq, and, inArray, lte, gte, desc, sql } from "drizzle-orm";
 import { fireCaseEvent } from "./eventMessaging";
+import { isEmailAutomationPaused } from "./emailAutomation";
 
 // ============================================================
 // SCANNER CONFIGURATION
@@ -54,6 +55,14 @@ export async function runProactiveOutreach(): Promise<{
     milestones: 0,
   };
 
+  // Kill switch: when email automation is paused, skip the three
+  // email-generating scans (expiry warnings, inactivity nudges, milestones).
+  // Deadline reminders are portal messages only (no email) and keep running.
+  const emailAutomationPaused = isEmailAutomationPaused();
+  if (emailAutomationPaused) {
+    console.log("[ProactiveOutreach] EMAIL_AUTOMATION_PAUSED=true — skipping expiry/inactivity/milestone scans, no emails sent");
+  }
+
   try {
     const db = await getDb();
     if (!db) {
@@ -73,22 +82,24 @@ export async function runProactiveOutreach(): Promise<{
     }
 
     for (const caseRecord of activeCases) {
-      // 1. Document Expiry Warnings
-      const expiryCount = await checkDocumentExpiry(db, caseRecord);
-      results.expiryWarnings += expiryCount;
+      if (!emailAutomationPaused) {
+        // 1. Document Expiry Warnings
+        const expiryCount = await checkDocumentExpiry(db, caseRecord);
+        results.expiryWarnings += expiryCount;
 
-      // 2. Inactivity Nudges (only for cases in collecting_documents)
-      if (caseRecord.status === "collecting_documents") {
-        const nudged = await checkInactivity(db, caseRecord);
-        if (nudged) results.inactivityNudges++;
+        // 2. Inactivity Nudges (only for cases in collecting_documents)
+        if (caseRecord.status === "collecting_documents") {
+          const nudged = await checkInactivity(db, caseRecord);
+          if (nudged) results.inactivityNudges++;
+        }
       }
 
-      // 3. Deadline Reminders (requerimientos)
+      // 3. Deadline Reminders (requerimientos) — portal message only, no email
       const deadlineCount = await checkDeadlines(db, caseRecord);
       results.deadlineReminders += deadlineCount;
 
       // 4. Milestone Celebrations (only for collecting_documents)
-      if (caseRecord.status === "collecting_documents") {
+      if (!emailAutomationPaused && caseRecord.status === "collecting_documents") {
         const celebrated = await checkMilestones(db, caseRecord);
         if (celebrated) results.milestones++;
       }

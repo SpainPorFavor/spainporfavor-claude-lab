@@ -11,6 +11,7 @@ import { serveStatic, setupVite } from "./vite";
 import { registerStripeWebhook } from "../stripe";
 import { registerProtectedDocumentRoutes } from "../protectedDocuments";
 import { registerChecklistRoutes } from "../pdfChecklists";
+import { registerPreviewAccess } from "../previewAccess";
 import { startProactiveOutreach } from "../proactiveOutreach";
 import { startRetentionScheduler } from "../dataRetention";
 import { startRiskEngineScheduler } from "../riskEngine";
@@ -87,6 +88,9 @@ async function startServer() {
   registerProtectedDocumentRoutes(app);
   registerChecklistRoutes(app);
   registerOAuthRoutes(app);
+  // Preview-access bypass route — must be registered before the SPA catch-all
+  // (Vite/static) so /preview-access is not swallowed by the client router.
+  registerPreviewAccess(app);
   // tRPC API
   app.use(
     "/api/trpc",

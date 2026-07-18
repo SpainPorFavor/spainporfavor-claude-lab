@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { createCheckoutSession, createPaymentIntent } from "./stripe";
 import { captureLead, getDb } from "./db";
+import { resolveGateDecisionFromEnv } from "./prelaunchGate";
 import { sendProspectEmail } from "./gmailService";
 import { invokeLLM } from "./_core/llm";
 import { portalRouter } from "./portalRouter";
@@ -308,6 +309,11 @@ export const appRouter = router({
           testMode: isTestMode,
         };
       }),
+    // Pre-launch waitlist gate — read at request time from PRELAUNCH_GATE_ENABLED
+    // and the httpOnly bypass cookie. Fully independent of STRIPE_TEST_MODE.
+    getPrelaunchGate: publicProcedure.query(({ ctx }) => {
+        return resolveGateDecisionFromEnv(ctx.req.headers.cookie);
+      }),
     createPaymentIntent: publicProcedure
       .input(
         z.object({
@@ -349,7 +355,7 @@ export const appRouter = router({
       .input(
         z.object({
           email: z.string().email(),
-          source: z.enum(["exit-intent", "quiz", "free-assessment"]),
+          source: z.enum(["exit-intent", "quiz", "free-assessment", "waitlist"]),
           nationality: z.string().nullable().optional(),
           visaType: z.string().optional(),
           name: z.string().optional(),

@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { autoCapitalize } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { PrelaunchWaitlistGate } from "@/components/PrelaunchWaitlistGate";
 import { useLocation } from "wouter";
 import {
   Shield,
@@ -623,18 +624,44 @@ function PaymentForm() {
 // Wrapper component that fetches Stripe config from server then provides Stripe context
 export default function OrderForm() {
   const { data: stripeConfig, isLoading } = trpc.checkout.getStripeConfig.useQuery();
+  // Pre-launch gate decision — resolved server-side (flag + bypass cookie).
+  // Batched into the same request as getStripeConfig (httpBatchLink), so this
+  // adds no extra round trip. When the flag is off the checkout path below is
+  // unchanged.
+  const { data: gate, isLoading: gateLoading } = trpc.checkout.getPrelaunchGate.useQuery();
   const [stripePromise, setStripePromise] = useState<ReturnType<typeof loadStripe> | null>(null);
 
   useEffect(() => {
+    // Don't load Stripe.js while the public gate is being shown.
+    if (gate?.showGate) return;
     if (stripeConfig?.publishableKey) {
       if (!stripePromiseCache) {
         stripePromiseCache = loadStripe(stripeConfig.publishableKey);
       }
       setStripePromise(stripePromiseCache);
     }
-  }, [stripeConfig?.publishableKey]);
+  }, [stripeConfig?.publishableKey, gate?.showGate]);
 
-  if (isLoading || !stripePromise) {
+  // Once the gate decision is in, show the public waitlist instead of checkout.
+  // (Hooks above always run first, so hook order stays stable.)
+  if (gate?.showGate) {
+    const params = new URLSearchParams(window.location.search);
+    const rawProductId = params.get("product");
+    const visaProductId = rawProductId && PRODUCT_INFO[rawProductId] ? rawProductId : null;
+    return (
+      <PrelaunchWaitlistGate
+        prefill={{
+          name: params.get("name") || "",
+          email: params.get("email") || "",
+          nationality: params.get("nationality"),
+          visaProductId,
+          visaLabel: visaProductId ? PRODUCT_INFO[visaProductId].name : null,
+        }}
+      />
+    );
+  }
+
+  if (gateLoading || isLoading || !stripePromise) {
     return (
       <div className="min-h-screen bg-[#FAFBFC] flex items-center justify-center">
         <div className="text-center">
